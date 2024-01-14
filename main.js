@@ -1,5 +1,6 @@
 const gameBoard = document.getElementById("board");
 const turnDisplay = document.getElementById("turn");
+const infoDisplay = document.getElementById("info");
 
 class TicTacToeGame {
     constructor(squares = 9) {
@@ -19,6 +20,7 @@ class TicTacToeGame {
 		];
         this.idsForO = [];
         this.idsForX = [];
+        this.gameWon = false;
         this.createBoard();
     }
 
@@ -43,27 +45,52 @@ class TicTacToeGame {
                         this.idsForX.push(e.target.id);
                     }
 
+                    this.loopThroughSequence(e);
                     this.changePlayer();
-                    this.checkForWinner(e);
                 }
             });
         }
     }
 
-    checkForWinner(e) {
-        // I need to match the list of ids for o's & x's with the winning sequences...
-        console.log(e.target.id, e.target.innerText);
+    loopThroughSequence(e) {
+        const currentPlayerIds = this.currentPlayer === this.players[0] ? this.idsForO : this.idsForX;
+    
+        this.everyWinningIdSequence.forEach((sequence) => {
+            let count = 0;
+    
+            sequence.forEach((id) => {
+                if (currentPlayerIds.includes(id.toString())) {
+                    count++;
+                }
+            });
+    
+            if (count === 3) {
+                this.gameWon = true;
+            }
+        });
+    
+        if (this.gameWon) {
+            this.validateWinner(this.currentPlayer);
+        }
+    }    
+
+    validateWinner(symbol) {
+        infoDisplay.style.fontWeight = "bold";
+        infoDisplay.style.fontSize = "1.5rem";
+        infoDisplay.innerText = `${symbol.toUpperCase()}'s are the winners ...`;
     }
 
     changePlayer() {
-        this.circlesTurn = !this.circlesTurn;
+        if(this.gameWon === false) {
+            this.circlesTurn = !this.circlesTurn;
 
-        if(this.circlesTurn) {
-            this.currentPlayer = this.players[0];
-            turnDisplay.innerText = this.players[0].toUpperCase();
-        } else {
-            this.currentPlayer = this.players[1];
-            turnDisplay.innerText = this.players[1].toUpperCase();
+            if(this.circlesTurn) {
+                this.currentPlayer = this.players[0];
+                turnDisplay.innerText = this.players[0].toUpperCase();
+            } else {
+                this.currentPlayer = this.players[1];
+                turnDisplay.innerText = this.players[1].toUpperCase();
+            }
         }
     }
 }
